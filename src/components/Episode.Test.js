@@ -1,32 +1,51 @@
-import React from "react";
-import { render, waitFor } from "@testing-library/react";
-import Episodes from "./Episodes";
+import axios from 'axios';
+const fetchShow = () => {
+  return axios
+    .get(
+      'https://api.tvmaze.com/singlesearch/shows?q=stranger-things&embed=episodes'
+    )
+    .then(res => {
+      return res;
+    });
+};
 
-test("testing to see id", async () => {
-    const { queryAllByTestId} = render(<Episodes episodes={[]} />);
-    expect (queryAllByTestId(/episode/i)).toHaveLength(0)
-  }); 
+export default fetchShow;  
+ 37  src/components/Episode.test.js 
+@@ -0,0 +1,37 @@
+import React from 'react';
+import { render, queryByTestId } from '@testing-library/react';
+import Episodes from './Episodes';
 
-  test("testing to see id", async () => {
-    const { queryAllByTestId} = render(<Episodes episodes={[
-        {
-            id: 553946,
-url: "http://www.tvmaze.com/episodes/553946/stranger-things-1x01-chapter-one-the-vanishing-of-will-byers",
-name: "Chapter One: The Vanishing of Will Byers",
-season: 1,
-number: 1,
-airdate: "2016-07-15",
-airtime: "",
-airstamp: "2016-07-15T12:00:00+00:00",
-runtime: 60,
-image:{
-medium: "http://static.tvmaze.com/uploads/images/medium_landscape/67/168918.jpg",
-original: "http://static.tvmaze.com/uploads/images/original_untouched/67/168918.jpg"},
-summary: "<p>A young boy mysteriously disappears, and his panicked mother demands that the police find him. Meanwhile, the boy's friends conduct their own search, and meet a mysterious girl in the forest.</p>",
-_links: {
-self: {
-href: "http://api.tvmaze.com/episodes/553946"}},
-        }
-    ]} />);
-    expect (queryAllByTestId(/episode/i)).toHaveLength(1)
-  }); 
+test("renders empty episodes array without errors", () => {
+    const {queryByTestId} = 
+        render(<Episodes episodes={[]} />);
+    const element = queryByTestId(/episodes-id/i);
+    expect(element.childNodes).toHaveLength(0);
+});
+
+test("renders some episodes correctly", () => {
+    const {queryAllByTestId} = 
+        render(<Episodes episodes={[
+            {
+                id: 1,
+                season: 1,
+                number: 1,
+                name: "A new beginning",
+                summary: "The first episode",
+                runtime: 40
+            },
+            {
+                id: 2,
+                season: 1,
+                number: 2,
+                name: "The plot thickens",
+                summary: "Things are getting interesting",
+                runtime: 40
+            }
+        ]} />);
+    const episodeNumberElements = queryAllByTestId(/episode-number-id/i);
+    expect(episodeNumberElements).toHaveLength(2);
+    expect(episodeNumberElements[0]).toHaveTextContent("Season 1, Episode 1");
+    expect(episodeNumberElements[1]).toHaveTextContent("Season 1, Episode 2");
+
+}); 
