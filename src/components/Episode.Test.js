@@ -1,51 +1,21 @@
-import axios from 'axios';
-const fetchShow = () => {
-  return axios
-    .get(
-      'https://api.tvmaze.com/singlesearch/shows?q=stranger-things&embed=episodes'
-    )
-    .then(res => {
-      return res;
-    });
-};
+import React from "react";
+import { render } from "@testing-library/react";
 
-export default fetchShow;  
- 37  src/components/Episode.test.js 
-@@ -0,0 +1,37 @@
-import React from 'react';
-import { render, queryByTestId } from '@testing-library/react';
-import Episodes from './Episodes';
+import Episodes from "./Episodes";
 
-test("renders empty episodes array without errors", () => {
-    const {queryByTestId} = 
-        render(<Episodes episodes={[]} />);
-    const element = queryByTestId(/episodes-id/i);
-    expect(element.childNodes).toHaveLength(0);
-});
+test("Renders Episodes without props, and again with props", () => {
+    const mockData = { 
+        id: '123',
+        image: { medium: 'medium_image'},
+        name: 'name',
+        season: 3,
+        number: 2,
+        summary: '<p>Summary</p>',
+        runtime: 20
+    }
+    const { queryAllByText, rerender, debug } = render(<Episodes episodes={[]}/>);
+    expect(queryAllByText(/season/i) === null);
+    rerender(<Episodes episodes={[mockData]}/>);
+    expect(queryAllByText(/name/i)).toHaveLength(1);
 
-test("renders some episodes correctly", () => {
-    const {queryAllByTestId} = 
-        render(<Episodes episodes={[
-            {
-                id: 1,
-                season: 1,
-                number: 1,
-                name: "A new beginning",
-                summary: "The first episode",
-                runtime: 40
-            },
-            {
-                id: 2,
-                season: 1,
-                number: 2,
-                name: "The plot thickens",
-                summary: "Things are getting interesting",
-                runtime: 40
-            }
-        ]} />);
-    const episodeNumberElements = queryAllByTestId(/episode-number-id/i);
-    expect(episodeNumberElements).toHaveLength(2);
-    expect(episodeNumberElements[0]).toHaveTextContent("Season 1, Episode 1");
-    expect(episodeNumberElements[1]).toHaveTextContent("Season 1, Episode 2");
-
-}); 
+}) 
